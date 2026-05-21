@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>实习周报-首页</title>
+		<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%E2%98%95%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+		<style>
+			:root {
+				--accent-color: #007aff;
+				--bg-gray: #f7f6f3;
+				--text-main: rgb(55, 53, 47);
+				--text-secondary: rgba(55, 53, 47, 0.6);
+				--card-bg: #fff;
+				--body-bg: #f7f6f3;
+				--base-font-size: 16px;
+				--menu-bg: rgba(255, 255, 255, 0.95);
+				--menu-font-size: 16px;
+				--header-top: 24px;
+				--header-btn-size: 44px;
+			}
+
+			body.dark-mode {
+				--bg-gray: #5a5a5c;
+				--text-main: #f2f2f7;
+				--text-secondary: #aeaeb2;
+				--card-bg: #4f4f51;
+				--body-bg: #404042;
+				--menu-bg: rgba(79, 79, 81, 0.96);
+			}
+
+			html {
+				font-size: var(--base-font-size);
+			}
+
+			body {
+				margin: 0;
+				padding: var(--header-top) 20px 40px;
+				font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+				color: var(--text-main);
+				line-height: 1.5;
+				background-color: var(--body-bg);
+				transition: background-color 0.3s, color 0.3s;
+			}
+			main {
+				max-width: 600px;
+				margin: 0 auto;
+			}
+			.header-section {
+				margin-bottom: 48px;
+				position: relative;
+			}
+			h1 {
+				font-size: 1.8rem;
+				margin: 0 0 16px;
+				min-height: var(--header-btn-size);
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding-right: calc(var(--header-btn-size) + 16px);
+			}
+			.profile-info {
+				font-size: 1rem;
+				color: var(--text-secondary);
+			}
+			.profile-info p {
+				margin: 4px 0;
+			}
+
+			h2 {
+				font-size: 1.4rem;
+				margin: 40px 0 16px;
+				font-weight: 700;
+			}
+
+			/* Hamburger menu button */
+			.hamburger-btn {
+				position: fixed;
+				top: var(--header-top);
+				right: 24px;
+				z-index: 1001;
+				background: var(--bg-gray);
+				border: none;
+				border-radius: 12px;
+				width: var(--header-btn-size);
+				height: var(--header-btn-size);
+				cursor: pointer;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				gap: 5px;
+				transition: background-color 0.2s;
+				box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+			}
+
+			.hamburger-btn:hover {
+				background-color: rgba(0, 0, 0, 0.06);
+			}
+
+			body.dark-mode .hamburger-btn:hover {
+				background-color: rgba(255, 255, 255, 0.08);
+			}
+
+			.hamburger-btn span {
+				display: block;
+				width: 20px;
+				height: 2px;
+				background-color: var(--text-main);
+				border-radius: 2px;
+				transition: all 0.3s ease;
+			}
+			.hamburger-btn.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+			.hamburger-btn.active span:nth-child(2) { opacity: 0; }
+			.hamburger-btn.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+			/* Settings Menu Panel — fixed size, unaffected by font slider */
+			.settings-menu {
+				position: fixed;
+				top: 0;
+				right: -300px;
+				width: 280px;
+				height: 100vh;
+				background: var(--menu-bg);
+				backdrop-filter: blur(20px);
+				-webkit-backdrop-filter: blur(20px);
+				z-index: 1000;
+				box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+				transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				padding: 100px 24px 24px;
+				box-sizing: border-box;
+				font-size: var(--menu-font-size);
+			}
+			.settings-menu.open {
+				right: 0;
+			}
+
+			.menu-item {
+				margin-bottom: 32px;
+			}
+			.menu-item > label {
+				display: block;
+				font-size: 14px;
+				font-weight: 600;
+				margin-bottom: 12px;
+				color: var(--text-secondary);
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+			}
+
+			.toggle-row > label:not(.switch) {
+				display: block;
+				font-size: var(--menu-font-size);
+				font-weight: 400;
+				margin: 0;
+				color: var(--text-main);
+				text-transform: none;
+				letter-spacing: normal;
+			}
+
+			/* Dark Mode Toggle */
+			.toggle-row {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+			.switch {
+				position: relative;
+				display: inline-block;
+				width: 50px;
+				height: 28px;
+			}
+			.switch input { opacity: 0; width: 0; height: 0; }
+			.slider {
+				position: absolute;
+				cursor: pointer;
+				top: 0; left: 0; right: 0; bottom: 0;
+				background-color: #ccc;
+				transition: .4s;
+				border-radius: 28px;
+			}
+			.slider:before {
+				position: absolute;
+				content: "";
+				height: 20px; width: 20px;
+				left: 4px; bottom: 4px;
+				background-color: white;
+				transition: .4s;
+				border-radius: 50%;
+				box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+			}
+			input:checked + .slider { background-color: var(--accent-color); }
+			input:checked + .slider:before { transform: translateX(22px); }
+
+			/* Font Size Slider */
+			.font-slider-container {
+				padding: 10px 0;
+			}
+			.font-slider {
+				-webkit-appearance: none;
+				width: 100%;
+				height: 6px;
+				background: #ddd;
+				border-radius: 3px;
+				outline: none;
+				margin: 15px 0;
+			}
+			.font-slider::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 24px;
+				height: 24px;
+				background: #fff;
+				border: 1px solid rgba(0,0,0,0.1);
+				border-radius: 50%;
+				cursor: pointer;
+				box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+			}
+			.slider-labels {
+				display: flex;
+				justify-content: space-between;
+				font-size: 12px;
+				color: var(--text-secondary);
+				margin-top: 8px;
+			}
+
+			/* Card UI Styles */
+			.card-container {
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+			}
+
+			.zhoubao-card {
+				background: var(--card-bg);
+				border-radius: 16px;
+				overflow: hidden;
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				cursor: pointer;
+				position: relative;
+				border: 1px solid rgba(0,0,0,0.03);
+			}
+
+			/* Expanded State */
+			.zhoubao-card.expanded {
+				background: var(--card-bg);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.03);
+				transform: translateY(-2px);
+				border-color: rgba(0, 0, 0, 0.05);
+			}
+
+			body.dark-mode .zhoubao-card.expanded {
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+				border-color: rgba(255, 255, 255, 0.06);
+			}
+
+			.card-cover {
+				width: 100%;
+				height: 0;
+				overflow: hidden;
+				transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.zhoubao-card.expanded .card-cover {
+				height: 240px;
+			}
+
+			.card-cover img,
+			.card-cover video {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+
+			.card-content {
+				padding: 16px 20px;
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+
+			.card-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.card-title {
+				font-size: 1.05rem;
+				font-weight: 600;
+				transition: all 0.3s ease;
+			}
+
+			.zhoubao-card.expanded .card-title {
+				font-size: 1.2rem;
+			}
+
+			.card-date {
+				font-size: 0.8rem;
+				color: var(--text-secondary);
+			}
+
+			.card-action {
+				opacity: 0;
+				visibility: hidden;
+				transition: all 0.3s ease;
+			}
+
+			.zhoubao-card.expanded .card-action {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.view-button {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				background: var(--accent-color);
+				color: #fff;
+				padding: 8px 16px;
+				border-radius: 18px;
+				text-decoration: none;
+				font-weight: 600;
+				font-size: 0.85rem;
+				transition: transform 0.2s, background-color 0.2s;
+			}
+
+			.view-button:hover {
+				transform: scale(1.05);
+				background-color: #0056b3;
+			}
+
+			/* Collapsed Hover */
+			.zhoubao-card:not(.expanded):hover {
+				background-color: var(--bg-gray);
+				opacity: 0.9;
+			}
+
+			@media (max-width: 600px) {
+				:root {
+					--header-top: 20px;
+				}
+				.zhoubao-card.expanded .card-cover {
+					height: 180px;
+				}
+				.hamburger-btn { right: 15px; }
+			}
+
+			/* Bottom Gradient Overlay */
+			.bottom-gradient {
+				position: fixed;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 160px;
+				background: linear-gradient(to top, 
+					var(--body-bg) 0%, 
+					var(--body-bg) 20%, 
+					transparent 100%);
+				pointer-events: none;
+				z-index: 999;
+			}
+			
+			/* Extra padding for main to scroll past gradient */
+			main {
+				padding-bottom: 100px;
+			}
+		</style>
+	</head>
+	<body>
+		<button
+			type="button"
+			class="hamburger-btn"
+			id="menuBtn"
+			aria-label="打开设置菜单"
+			aria-expanded="false"
+			aria-controls="settingsMenu"
+		>
+			<span></span>
+			<span></span>
+			<span></span>
+		</button>
+
+		<aside class="settings-menu" id="settingsMenu">
+			<div class="menu-item">
+				<div class="toggle-row">
+					<label>Dark Mode</label>
+					<label class="switch">
+						<input type="checkbox" id="darkModeToggle">
+						<span class="slider"></span>
+					</label>
+				</div>
+			</div>
+
+			<div class="menu-item">
+				<label>Font Size</label>
+				<div class="font-slider-container">
+					<input type="range" min="14" max="24" value="16" class="font-slider" id="fontSlider">
+					<div class="slider-labels">
+						<span>Small</span>
+						<span id="fontSizeLabel">16px</span>
+						<span>Large</span>
+					</div>
+				</div>
+			</div>
+		</aside>
+
+		<main>
+			<div class="header-section">
+				<h1><span class="home-icon" aria-hidden="true">☕️</span>实习周报</h1>
+				<div class="profile-info">
+					<p>实习生：周悦</p>
+					<p>部门：MUX酷狗设计部 · 平台设计组</p>
+					<p>实习时间：2026.05.08 - 至今</p>
+				</div>
+			</div>
+
+			<h2>本周周报</h2>
+			
+			<div class="card-container">
+				<!-- 第二周 (倒序，最新的在上面) -->
+				<div class="zhoubao-card expanded" onclick="toggleCard(this)">
+					<div class="card-cover">
+						<video src="week2/W2/cover2.mp4" autoplay muted loop playsinline></video>
+					</div>
+					<div class="card-content">
+						<div class="card-header">
+							<div class="card-title">第二周</div>
+							<div class="card-action">
+								<a href="week2/zhoubao2.html" class="view-button" onclick="event.stopPropagation()">
+									查看详情 <span>→</span>
+								</a>
+							</div>
+						</div>
+						<div class="card-date">2026.05.18 - 2026.05.22</div>
+					</div>
+				</div>
+
+				<!-- 第一周 -->
+				<div class="zhoubao-card" onclick="toggleCard(this)">
+					<div class="card-cover">
+						<video src="week1/W1/cover1.mp4" autoplay muted loop playsinline></video>
+					</div>
+					<div class="card-content">
+						<div class="card-header">
+							<div class="card-title">第一周</div>
+							<div class="card-action">
+								<a href="week1/zhoubao1.html" class="view-button" onclick="event.stopPropagation()">
+									查看详情 <span>→</span>
+								</a>
+							</div>
+						</div>
+						<div class="card-date">2026.05.11 - 2026.05.15</div>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<div class="bottom-gradient"></div>
+
+		<script>
+			// Card toggle logic
+			function toggleCard(selectedCard) {
+				const allCards = document.querySelectorAll('.zhoubao-card');
+				const isAlreadyExpanded = selectedCard.classList.contains('expanded');
+				
+				allCards.forEach(card => card.classList.remove('expanded'));
+				if (!isAlreadyExpanded) selectedCard.classList.add('expanded');
+			}
+
+			// Menu logic
+			const menuBtn = document.getElementById('menuBtn');
+			const settingsMenu = document.getElementById('settingsMenu');
+			const body = document.body;
+
+			function setMenuOpen(open) {
+				menuBtn.classList.toggle('active', open);
+				settingsMenu.classList.toggle('open', open);
+				menuBtn.setAttribute('aria-expanded', open);
+			}
+
+			menuBtn.addEventListener('click', () => {
+				setMenuOpen(!settingsMenu.classList.contains('open'));
+			});
+
+			// Close menu when clicking outside
+			document.addEventListener('click', (e) => {
+				if (!settingsMenu.contains(e.target) && !menuBtn.contains(e.target) && settingsMenu.classList.contains('open')) {
+					setMenuOpen(false);
+				}
+			});
+
+			// Dark Mode logic
+			const darkModeToggle = document.getElementById('darkModeToggle');
+			
+			// Load preference
+			if (localStorage.getItem('dark-mode') === 'true') {
+				body.classList.add('dark-mode');
+				darkModeToggle.checked = true;
+			}
+
+			darkModeToggle.addEventListener('change', (e) => {
+				if (e.target.checked) {
+					body.classList.add('dark-mode');
+					localStorage.setItem('dark-mode', 'true');
+				} else {
+					body.classList.remove('dark-mode');
+					localStorage.setItem('dark-mode', 'false');
+				}
+			});
+
+			// Font Size logic
+			const fontSlider = document.getElementById('fontSlider');
+			const fontSizeLabel = document.getElementById('fontSizeLabel');
+
+			// Load preference
+			const savedFontSize = localStorage.getItem('font-size');
+			if (savedFontSize) {
+				document.documentElement.style.setProperty('--base-font-size', savedFontSize + 'px');
+				fontSlider.value = savedFontSize;
+				fontSizeLabel.textContent = savedFontSize + 'px';
+			}
+
+			fontSlider.addEventListener('input', (e) => {
+				const val = e.target.value;
+				document.documentElement.style.setProperty('--base-font-size', val + 'px');
+				fontSizeLabel.textContent = val + 'px';
+				localStorage.setItem('font-size', val);
+			});
+		</script>
+	</body>
+</html>
