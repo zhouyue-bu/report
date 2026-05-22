@@ -312,7 +312,7 @@ body {
 
 	.page > header {
 		max-width: var(--content-max);
-		margin-top: -120px;
+		margin-top: -140px;
 		margin-bottom: 0;
 		margin-right: auto;
 		margin-left: 0;
@@ -345,13 +345,14 @@ body.embed-mode .report-links {
 }
 
 .report-links {
-	margin-top: 48px;
-	padding-top: 24px;
+	margin-top: 12px;
+	padding-top: 8px;
 	border-top: 1px solid var(--table-border);
 }
 
 .report-links-title {
-	margin: 0 0 12px;
+	margin: 0 0 8px;
+	font-size: 1rem;
 }
 
 .report-links-list {
@@ -444,6 +445,10 @@ h3 strong {
 	line-height: 1.5;
 }
 
+h1.page-title {
+	margin-top: 0;
+}
+
 h1 {
 	font-size: 1.875rem;
 	margin-top: 1.875rem;
@@ -502,6 +507,7 @@ hr {
 
 img {
 	max-width: 100%;
+	cursor: zoom-in;
 }
 
 video {
@@ -510,38 +516,28 @@ video {
 	display: block;
 }
 
-.media-stack img,
-.media-stack video {
-	cursor: zoom-in;
-}
-
-.media-preview-overlay {
+.image-lightbox {
 	position: fixed;
 	inset: 0;
-	display: flex;
+	display: none;
 	align-items: center;
 	justify-content: center;
 	padding: 24px;
-	background: rgba(0, 0, 0, 0.86);
-	z-index: 4000;
+	background: rgba(0, 0, 0, 0.88);
+	z-index: 2000;
 }
 
-.media-preview-overlay[hidden] {
-	display: none;
+.image-lightbox.open {
+	display: flex;
 }
 
-.media-preview-content {
+.image-lightbox img {
 	max-width: min(96vw, 1400px);
 	max-height: 92vh;
-}
-
-.media-preview-content img,
-.media-preview-content video {
-	display: block;
-	max-width: 100%;
-	max-height: 92vh;
-	border-radius: 14px;
-	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+	width: auto;
+	height: auto;
+	object-fit: contain;
+	cursor: zoom-out;
 }
 
 .media-stack {
@@ -1267,7 +1263,7 @@ blockquote.quote-large {
 </p></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-8094-b936-df461618dc5b" class="">Part1: AI agent创新形式探索</p></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-80f6-a005-d418f0855bc3" class="">
 </p></div><div style="display:contents" dir="auto"><div class="media-stack"><figure><img src="W1/Yue.png" alt="Yue"></figure><figure><video controls playsinline preload="metadata"><source src="W1/123.mp4" type="video/mp4"></video></figure></div></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-80d9-add5-e60b0707ea86" class="">Part2: 酷小狗形态IP</p></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-8008-8d14-f73055e29a28" class="">
 </p></div><div style="display:contents" dir="auto"><div class="media-stack"><figure><video controls playsinline preload="metadata"><source src="W1/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4" type="video/mp4"></video></figure></div></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-80a4-be37-c85422294cd1" class="">Part3：其他方案</p></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-80d6-a153-f520a927205c" class="">
-</p></div><div style="display:contents" dir="auto"><div class="media-stack"><figure><img src="W1/part3.png" alt="part3"></figure></div></div><div class="report-links"><p class="report-links-title"><strong>往期周报</strong></p><div class="report-links-list"><a class="report-link-card" href="../week2/zhoubao2.html"><div class="report-link-title">第二周</div><div class="report-link-date">2026.05.18 - 2026.05.22</div></a><a class="report-link-card" href="../week1/zhoubao1.html"><div class="report-link-title">第一周</div><div class="report-link-date">2026.05.11 - 2026.05.15</div></a></div></div></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span>	<script>
+</p></div><div style="display:contents" dir="auto"><div class="media-stack"><figure><img src="W1/part3.png" alt="part3"></figure></div></div><div class="report-links"><p class="report-links-title"><strong>往期周报</strong></p><div class="report-links-list"><a class="report-link-card" href="../week2/zhoubao2.html"><div class="report-link-title">第二周</div><div class="report-link-date">2026.05.18 - 2026.05.22</div></a><a class="report-link-card" href="../week1/zhoubao1.html"><div class="report-link-title">第一周</div><div class="report-link-date">2026.05.11 - 2026.05.15</div></a></div></div></div></article><div class="image-lightbox" id="imageLightbox" aria-hidden="true"><img id="lightboxImage" alt=""></div><span class="sans" style="font-size:14px;padding-top:2em"></span>	<script>
 		// Menu logic
 		const menuBtn = document.getElementById('menuBtn');
 		const settingsMenu = document.getElementById('settingsMenu');
@@ -1288,19 +1284,22 @@ blockquote.quote-large {
 
 		// Dark Mode logic
 		const darkModeToggle = document.getElementById('darkModeToggle');
+		const applyDarkMode = (enabled) => {
+			body.classList.toggle('dark-mode', enabled);
+			darkModeToggle.checked = enabled;
+		};
 		
 		// Load preference
 		if (localStorage.getItem('dark-mode') === 'true') {
-			body.classList.add('dark-mode');
-			darkModeToggle.checked = true;
+			applyDarkMode(true);
 		}
 
 		darkModeToggle.addEventListener('change', (e) => {
 			if (e.target.checked) {
-				body.classList.add('dark-mode');
+				applyDarkMode(true);
 				localStorage.setItem('dark-mode', 'true');
 			} else {
-				body.classList.remove('dark-mode');
+				applyDarkMode(false);
 				localStorage.setItem('dark-mode', 'false');
 			}
 		});
@@ -1308,20 +1307,30 @@ blockquote.quote-large {
 		// Font Size logic
 		const fontSlider = document.getElementById('fontSlider');
 		const fontSizeLabel = document.getElementById('fontSizeLabel');
+		const applyFontSize = (value) => {
+			if (!value) return;
+			document.documentElement.style.setProperty('--base-font-size', value + 'px');
+			fontSlider.value = value;
+			fontSizeLabel.textContent = value + 'px';
+		};
 
 		// Load preference
 		const savedFontSize = localStorage.getItem('font-size');
 		if (savedFontSize) {
-			document.documentElement.style.setProperty('--base-font-size', savedFontSize + 'px');
-			fontSlider.value = savedFontSize;
-			fontSizeLabel.textContent = savedFontSize + 'px';
+			applyFontSize(savedFontSize);
 		}
 
 		fontSlider.addEventListener('input', (e) => {
 			const val = e.target.value;
-			document.documentElement.style.setProperty('--base-font-size', val + 'px');
-			fontSizeLabel.textContent = val + 'px';
+			applyFontSize(val);
 			localStorage.setItem('font-size', val);
+		});
+
+		window.addEventListener('message', (event) => {
+			const data = event.data;
+			if (!data) return;
+			if (data.type === 'reportFontSize' && data.value) applyFontSize(data.value);
+			if (data.type === 'reportDarkMode') applyDarkMode(Boolean(data.enabled));
 		});
 
 		function encodeMediaPath(url) {
@@ -1352,59 +1361,6 @@ blockquote.quote-large {
 
 		const params = new URLSearchParams(window.location.search);
 		const isEmbed = params.get('embed') === '1';
-
-		const previewOverlay = document.createElement('div');
-		previewOverlay.className = 'media-preview-overlay';
-		previewOverlay.hidden = true;
-		previewOverlay.innerHTML = '<div class="media-preview-content"></div>';
-		document.body.appendChild(previewOverlay);
-
-		const previewContent = previewOverlay.querySelector('.media-preview-content');
-
-		function closeMediaPreview() {
-			previewOverlay.hidden = true;
-			previewContent.innerHTML = '';
-		}
-
-		function openLocalMediaPreview(mediaType, src) {
-			const mediaNode = document.createElement(mediaType === 'video' ? 'video' : 'img');
-			if (mediaType === 'video') {
-				mediaNode.src = src;
-				mediaNode.controls = true;
-				mediaNode.autoplay = true;
-			} else {
-				mediaNode.src = src;
-				mediaNode.alt = '预览';
-			}
-			previewContent.innerHTML = '';
-			previewContent.appendChild(mediaNode);
-			previewOverlay.hidden = false;
-		}
-
-		previewOverlay.addEventListener('click', (e) => {
-			if (e.target === previewOverlay) closeMediaPreview();
-		});
-
-		document.addEventListener('keydown', (e) => {
-			if (e.key === 'Escape' && !previewOverlay.hidden) closeMediaPreview();
-		});
-
-		document.querySelectorAll('.media-stack img, .media-stack video').forEach((node) => {
-			node.addEventListener('click', () => {
-				const mediaType = node.tagName.toLowerCase() === 'video' ? 'video' : 'image';
-				const rawSrc = node.tagName.toLowerCase() === 'video'
-					? (node.getAttribute('src') || node.querySelector('source')?.getAttribute('src'))
-					: node.getAttribute('src');
-				if (!rawSrc) return;
-				const absoluteSrc = new URL(rawSrc, window.location.href).href;
-				if (isEmbed) {
-					window.parent.postMessage({ type: 'openMediaPreview', mediaType, src: absoluteSrc }, '*');
-					return;
-				}
-				openLocalMediaPreview(mediaType, absoluteSrc);
-			});
-		});
-
 		if (isEmbed) {
 			body.classList.add('embed-mode');
 			const postHeight = () => {
@@ -1430,5 +1386,28 @@ blockquote.quote-large {
 			const list = reportLinks.querySelector('.report-links-list');
 			if (list && list.children.length === 0) reportLinks.remove();
 		}
+
+		const lightbox = document.getElementById('imageLightbox');
+		const lightboxImage = document.getElementById('lightboxImage');
+		const openLightbox = (src, alt = '') => {
+			lightboxImage.src = src;
+			lightboxImage.alt = alt;
+			lightbox.classList.add('open');
+			lightbox.setAttribute('aria-hidden', 'false');
+			body.style.overflow = 'hidden';
+		};
+		const closeLightbox = () => {
+			lightbox.classList.remove('open');
+			lightbox.setAttribute('aria-hidden', 'true');
+			lightboxImage.removeAttribute('src');
+			body.style.overflow = '';
+		};
+		document.querySelectorAll('img:not(.icon):not(.notion-static-icon)').forEach((img) => {
+			img.addEventListener('click', () => openLightbox(img.currentSrc || img.src, img.alt || 'preview'));
+		});
+		lightbox.addEventListener('click', closeLightbox);
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
+		});
 	</script>
 </body></html>

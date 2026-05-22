@@ -47,7 +47,7 @@
 				margin: 0 auto;
 			}
 			.header-section {
-				margin-bottom: 48px;
+				margin-bottom: 24px;
 				position: relative;
 			}
 			h1 {
@@ -68,8 +68,8 @@
 			}
 
 			h2 {
-				font-size: 1.4rem;
-				margin: 40px 0 16px;
+				font-size: 1.15rem;
+				margin: 28px 0 12px;
 				font-weight: 700;
 			}
 
@@ -359,8 +359,8 @@
 			}
 
 			.latest-report {
-				margin-top: 16px;
-				margin-bottom: 56px;
+				margin-top: 4px;
+				margin-bottom: 40px;
 			}
 
 			.report-iframe {
@@ -369,35 +369,6 @@
 				border: 0;
 				min-height: 400px;
 				background: transparent;
-			}
-
-			.media-preview-overlay {
-				position: fixed;
-				inset: 0;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				padding: 24px;
-				background: rgba(0, 0, 0, 0.86);
-				z-index: 4000;
-			}
-
-			.media-preview-overlay[hidden] {
-				display: none;
-			}
-
-			.media-preview-content {
-				max-width: min(96vw, 1400px);
-				max-height: 92vh;
-			}
-
-			.media-preview-content img,
-			.media-preview-content video {
-				display: block;
-				max-width: 100%;
-				max-height: 92vh;
-				border-radius: 14px;
-				box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 			}
 		</style>
 	</head>
@@ -459,9 +430,6 @@
 		</main>
 
 		<div class="bottom-gradient"></div>
-		<div class="media-preview-overlay" id="mediaPreviewOverlay" hidden>
-			<div class="media-preview-content" id="mediaPreviewContent"></div>
-		</div>
 
 		<script>
 			const reports = [
@@ -506,47 +474,33 @@
 				iframe.style.height = `${Math.max(120, height)}px`;
 			}
 
-			const mediaPreviewOverlay = document.getElementById('mediaPreviewOverlay');
-			const mediaPreviewContent = document.getElementById('mediaPreviewContent');
-
-			function closeMediaPreview() {
-				mediaPreviewOverlay.hidden = true;
-				mediaPreviewContent.innerHTML = '';
+			function syncFontSizeToFrames(value) {
+				document.querySelectorAll('iframe.report-iframe').forEach((iframe) => {
+					try {
+						iframe.contentWindow.postMessage({ type: 'reportFontSize', value }, '*');
+					} catch {}
+					try {
+						iframe.contentDocument.documentElement.style.setProperty('--base-font-size', value + 'px');
+					} catch {}
+				});
 			}
 
-			function openMediaPreview(mediaType, src) {
-				const mediaNode = document.createElement(mediaType === 'video' ? 'video' : 'img');
-				if (mediaType === 'video') {
-					mediaNode.src = src;
-					mediaNode.controls = true;
-					mediaNode.autoplay = true;
-				} else {
-					mediaNode.src = src;
-					mediaNode.alt = '预览';
-				}
-				mediaPreviewContent.innerHTML = '';
-				mediaPreviewContent.appendChild(mediaNode);
-				mediaPreviewOverlay.hidden = false;
+			function syncDarkModeToFrames(enabled) {
+				document.querySelectorAll('iframe.report-iframe').forEach((iframe) => {
+					try {
+						iframe.contentWindow.postMessage({ type: 'reportDarkMode', enabled }, '*');
+					} catch {}
+					try {
+						iframe.contentDocument.body.classList.toggle('dark-mode', enabled);
+					} catch {}
+				});
 			}
 
 			window.addEventListener('message', (event) => {
 				const data = event.data;
-				if (!data) return;
-				if (data.type === 'openMediaPreview' && data.src) {
-					openMediaPreview(data.mediaType, data.src);
-					return;
-				}
-				if (data.type !== 'reportHeight' || !data.name) return;
+				if (!data || data.type !== 'reportHeight' || !data.name) return;
 				const iframe = document.querySelector(`iframe[name="${data.name}"]`);
 				setIframeHeight(iframe, data.height);
-			});
-
-			mediaPreviewOverlay.addEventListener('click', (e) => {
-				if (e.target === mediaPreviewOverlay) closeMediaPreview();
-			});
-
-			document.addEventListener('keydown', (e) => {
-				if (e.key === 'Escape' && !mediaPreviewOverlay.hidden) closeMediaPreview();
 			});
 
 			document.querySelectorAll('iframe.report-iframe').forEach((iframe) => {
@@ -554,6 +508,9 @@
 					try {
 						setIframeHeight(iframe, iframe.contentDocument.documentElement.scrollHeight);
 					} catch {}
+					syncDarkModeToFrames(body.classList.contains('dark-mode'));
+					const currentValue = Number.parseInt(fontSlider.value, 10);
+					if (Number.isFinite(currentValue)) syncFontSizeToFrames(currentValue);
 				});
 			});
 
@@ -586,15 +543,18 @@
 			if (localStorage.getItem('dark-mode') === 'true') {
 				body.classList.add('dark-mode');
 				darkModeToggle.checked = true;
+				syncDarkModeToFrames(true);
 			}
 
 			darkModeToggle.addEventListener('change', (e) => {
 				if (e.target.checked) {
 					body.classList.add('dark-mode');
 					localStorage.setItem('dark-mode', 'true');
+					syncDarkModeToFrames(true);
 				} else {
 					body.classList.remove('dark-mode');
 					localStorage.setItem('dark-mode', 'false');
+					syncDarkModeToFrames(false);
 				}
 			});
 
@@ -608,6 +568,7 @@
 				document.documentElement.style.setProperty('--base-font-size', savedFontSize + 'px');
 				fontSlider.value = savedFontSize;
 				fontSizeLabel.textContent = savedFontSize + 'px';
+				syncFontSizeToFrames(Number(savedFontSize));
 			}
 
 			fontSlider.addEventListener('input', (e) => {
@@ -615,6 +576,7 @@
 				document.documentElement.style.setProperty('--base-font-size', val + 'px');
 				fontSizeLabel.textContent = val + 'px';
 				localStorage.setItem('font-size', val);
+				syncFontSizeToFrames(Number(val));
 			});
 		</script>
 	</body>
