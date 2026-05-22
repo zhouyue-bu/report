@@ -312,10 +312,10 @@ body {
 
 	.page > header {
 		max-width: var(--content-max);
-		margin-top: 0;
+		margin-top: -120px;
 		margin-bottom: 0;
 		margin-right: auto;
-		margin-left: max(0px, (min(var(--page-max), 100%) - var(--content-max)) / 2);
+		margin-left: 0;
 		padding: 0;
 	}
 }
@@ -1224,6 +1224,32 @@ blockquote.quote-large {
 			document.documentElement.style.setProperty('--base-font-size', val + 'px');
 			fontSizeLabel.textContent = val + 'px';
 			localStorage.setItem('font-size', val);
+		});
+
+		function encodeMediaPath(url) {
+			try {
+				const parts = url.split('/');
+				const file = decodeURIComponent(parts.pop());
+				parts.push(encodeURIComponent(file));
+				return parts.join('/');
+			} catch {
+				return url;
+			}
+		}
+
+		document.querySelectorAll('.media-stack figure').forEach((figure) => {
+			const img = figure.querySelector('img');
+			const source = figure.querySelector('video source');
+			const video = figure.querySelector('video');
+			const media = img || source;
+			if (!media) return;
+
+			const src = encodeMediaPath(media.getAttribute('src'));
+			media.setAttribute('src', src);
+			if (video) {
+				video.setAttribute('src', src);
+				video.load();
+			}
 		});
 	</script>
 </body></html>
