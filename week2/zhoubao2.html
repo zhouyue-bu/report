@@ -1365,6 +1365,26 @@ blockquote.quote-large {
 			}
 		});
 
+		document.querySelectorAll('video').forEach((video) => {
+			video.muted = true;
+			video.loop = true;
+			video.autoplay = true;
+			video.playsInline = true;
+			video.setAttribute('muted', '');
+			video.setAttribute('loop', '');
+			video.setAttribute('autoplay', '');
+			video.setAttribute('playsinline', '');
+			video.addEventListener('loadedmetadata', () => {
+				video.play().catch(() => {});
+			});
+			video.addEventListener('click', async () => {
+				try {
+					if (video.requestFullscreen) await video.requestFullscreen();
+					else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+				} catch {}
+			});
+		});
+
 		const params = new URLSearchParams(window.location.search);
 		const isEmbed = params.get('embed') === '1';
 		if (isEmbed) {
@@ -1409,7 +1429,15 @@ blockquote.quote-large {
 			body.style.overflow = '';
 		};
 		document.querySelectorAll('img:not(.icon):not(.notion-static-icon)').forEach((img) => {
-			img.addEventListener('click', () => openLightbox(img.currentSrc || img.src, img.alt || 'preview'));
+			img.addEventListener('click', () => {
+				const src = img.currentSrc || img.src;
+				const alt = img.alt || 'preview';
+				if (isEmbed) {
+					window.parent.postMessage({ type: 'reportImageOpen', src, alt }, '*');
+					return;
+				}
+				openLightbox(src, alt);
+			});
 		});
 		lightbox.addEventListener('click', closeLightbox);
 		document.addEventListener('keydown', (e) => {
