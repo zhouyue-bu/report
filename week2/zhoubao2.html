@@ -1254,18 +1254,6 @@ blockquote.quote-large {
 				</label>
 			</div>
 		</div>
-
-		<div class="menu-item">
-			<label>Font Size</label>
-			<div class="font-slider-container">
-				<input type="range" min="14" max="24" value="16" class="font-slider" id="fontSlider">
-				<div class="slider-labels">
-					<span>Small</span>
-					<span id="fontSizeLabel">16px</span>
-					<span>Large</span>
-				</div>
-			</div>
-		</div>
 	</aside>
 
 	<article id="ad2b2cae-7a84-822a-ac0b-01c92efda589" class="page sans"><header><h1 class="page-title" dir="auto">第二周</h1><p class="page-date">2026.05.18 - 2026.05.22</p><p class="page-description" dir="auto"></p></header><div class="page-body"><div style="display:contents" dir="auto"><p id="361b2cae-7a84-805e-a4fd-f1cf0840e4c7" class=""><strong>一、工作总结</strong></p></div><div class="table-scroll" dir="ltr"><table id="cd30ca7f-aa31-4980-822f-8a38e432f303" class="simple-table"><tbody><div style="display:contents" dir="ltr"><tr id="9c7497cc-7def-4567-a9fe-211eb83ee231"><td id="=sSW" class="" style="width:260px">成长性</td><td id="TMbF" class="" style="width:260px">待改进</td></tr></div><div style="display:contents" dir="ltr"><tr id="99ed909d-a49a-4659-9e1f-c9b34145985a"><td id="=sSW" class="" style="width:260px"><mark class="highlight-yellow_background"><strong>1. AI agent 形象设计迭代</strong></mark>  </td><td id="TMbF" class="" style="width:260px"><mark class="highlight-yellow_background"><strong>1. Ai 提示词整合</strong></mark></td></tr></div><div style="display:contents" dir="ltr"><tr id="45ea750a-43cd-49fe-bd2d-be526a141248"><td id="=sSW" class="" style="width:260px">紧跟行业审美趋势，应用于酷小狗 IP 形象优化方案。</td><td id="TMbF" class="" style="width:260px">批量生成效果不达预期，需汇总优质提示词。</td></tr></div><div style="display:contents" dir="ltr"><tr id="361b2cae-7a84-8062-8eff-c2b413a4c022"><td id="=sSW" class="" style="width:260px"><mark class="highlight-yellow_background"><strong>2. 音乐 APP 设计调研</strong></mark></td><td id="TMbF" class="" style="width:260px"><mark class="highlight-yellow_background"><strong>2. 产品思维与创意 </strong></mark></td></tr></div><div style="display:contents" dir="ltr"><tr id="361b2cae-7a84-8002-a7fd-d5cd7dc1d6c8"><td id="=sSW" class="" style="width:260px">体验多款产品（含测试版），探索 AI 玩法和创新体验设计思路。</td><td id="TMbF" class="" style="width:260px">产品切入点与创意体验构思欠缺，仍需持续积累打磨。</td></tr></div></tbody></table></div><div style="display:contents" dir="ltr"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="361b2cae-7a84-80aa-a299-c242a485e5ee"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="361b2cae-7a84-8049-aec4-f9638b6bde8e" class="">工作小结</p></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-80ea-a4d7-d4a377ce9d5c" class="">熟练项目设计节奏与风格；参考多款音乐产品，对创新交互设计有更深认知。</p></div></div></figure></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-80e1-accf-e3f17be4a722" class="">
@@ -1311,13 +1299,13 @@ blockquote.quote-large {
 		});
 
 		// Font Size logic
-		const fontSlider = document.getElementById('fontSlider');
-		const fontSizeLabel = document.getElementById('fontSizeLabel');
 		const applyFontSize = (value) => {
 			if (!value) return;
 			document.documentElement.style.setProperty('--base-font-size', value + 'px');
-			fontSlider.value = value;
-			fontSizeLabel.textContent = value + 'px';
+			const fontSlider = document.getElementById('fontSlider');
+			const fontSizeLabel = document.getElementById('fontSizeLabel');
+			if (fontSlider) fontSlider.value = value;
+			if (fontSizeLabel) fontSizeLabel.textContent = value + 'px';
 		};
 
 		// Load preference
@@ -1326,11 +1314,14 @@ blockquote.quote-large {
 			applyFontSize(savedFontSize);
 		}
 
-		fontSlider.addEventListener('input', (e) => {
-			const val = e.target.value;
-			applyFontSize(val);
-			localStorage.setItem('font-size', val);
-		});
+		const fontSlider = document.getElementById('fontSlider');
+		if (fontSlider) {
+			fontSlider.addEventListener('input', (e) => {
+				const val = e.target.value;
+				applyFontSize(val);
+				localStorage.setItem('font-size', val);
+			});
+		}
 
 		window.addEventListener('message', (event) => {
 			const data = event.data;
