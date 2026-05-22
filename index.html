@@ -239,6 +239,16 @@
 				cursor: pointer;
 				position: relative;
 				border: 1px solid rgba(0,0,0,0.03);
+				display: block;
+			}
+
+			a.zhoubao-card {
+				color: inherit;
+				text-decoration: none;
+			}
+
+			.zhoubao-card.no-cover .card-header {
+				justify-content: flex-start;
 			}
 
 			/* Expanded State */
@@ -256,13 +266,8 @@
 
 			.card-cover {
 				width: 100%;
-				height: 0;
-				overflow: hidden;
-				transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-			}
-
-			.zhoubao-card.expanded .card-cover {
 				height: 240px;
+				overflow: hidden;
 			}
 
 			.card-cover img,
@@ -288,11 +293,6 @@
 			.card-title {
 				font-size: 1.05rem;
 				font-weight: 600;
-				transition: all 0.3s ease;
-			}
-
-			.zhoubao-card.expanded .card-title {
-				font-size: 1.2rem;
 			}
 
 			.card-date {
@@ -301,12 +301,6 @@
 			}
 
 			.card-action {
-				opacity: 0;
-				visibility: hidden;
-				transition: all 0.3s ease;
-			}
-
-			.zhoubao-card.expanded .card-action {
 				opacity: 1;
 				visibility: visible;
 			}
@@ -331,7 +325,7 @@
 			}
 
 			/* Collapsed Hover */
-			.zhoubao-card:not(.expanded):hover {
+			.zhoubao-card:hover {
 				background-color: var(--bg-gray);
 				opacity: 0.9;
 			}
@@ -340,9 +334,7 @@
 				:root {
 					--header-top: 20px;
 				}
-				.zhoubao-card.expanded .card-cover {
-					height: 180px;
-				}
+				.card-cover { height: 180px; }
 				.hamburger-btn { right: 15px; }
 			}
 
@@ -364,6 +356,48 @@
 			/* Extra padding for main to scroll past gradient */
 			main {
 				padding-bottom: 100px;
+			}
+
+			.latest-report {
+				margin-top: 16px;
+				margin-bottom: 56px;
+			}
+
+			.report-iframe {
+				display: block;
+				width: 100%;
+				border: 0;
+				min-height: 400px;
+				background: transparent;
+			}
+
+			.media-preview-overlay {
+				position: fixed;
+				inset: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 24px;
+				background: rgba(0, 0, 0, 0.86);
+				z-index: 4000;
+			}
+
+			.media-preview-overlay[hidden] {
+				display: none;
+			}
+
+			.media-preview-content {
+				max-width: min(96vw, 1400px);
+				max-height: 92vh;
+			}
+
+			.media-preview-content img,
+			.media-preview-content video {
+				display: block;
+				max-width: 100%;
+				max-height: 92vh;
+				border-radius: 14px;
+				box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 			}
 		</style>
 	</head>
@@ -415,58 +449,113 @@
 				</div>
 			</div>
 
-			<h2>本周周报</h2>
-			
-			<div class="card-container">
-				<!-- 第二周 (倒序，最新的在上面) -->
-				<div class="zhoubao-card expanded" onclick="toggleCard(this)">
-					<div class="card-cover">
-						<video src="week2/W2/cover2.mp4" autoplay muted loop playsinline></video>
-					</div>
-					<div class="card-content">
-						<div class="card-header">
-							<div class="card-title">第二周</div>
-							<div class="card-action">
-								<a href="week2/zhoubao2.html" class="view-button" onclick="event.stopPropagation()">
-									查看详情 <span>→</span>
-								</a>
-							</div>
-						</div>
-						<div class="card-date">2026.05.18 - 2026.05.22</div>
-					</div>
-				</div>
-
-				<!-- 第一周 -->
-				<div class="zhoubao-card" onclick="toggleCard(this)">
-					<div class="card-cover">
-						<video src="week1/W1/cover1.mp4" autoplay muted loop playsinline></video>
-					</div>
-					<div class="card-content">
-						<div class="card-header">
-							<div class="card-title">第一周</div>
-							<div class="card-action">
-								<a href="week1/zhoubao1.html" class="view-button" onclick="event.stopPropagation()">
-									查看详情 <span>→</span>
-								</a>
-							</div>
-						</div>
-						<div class="card-date">2026.05.11 - 2026.05.15</div>
-					</div>
-				</div>
+			<div class="latest-report">
+				<iframe class="report-iframe" id="latestReport" name="latestReport" src="week2/zhoubao2.html?embed=1" loading="lazy"></iframe>
 			</div>
+
+			<h2>往期周报</h2>
+
+			<div class="card-container" id="archiveList"></div>
 		</main>
 
 		<div class="bottom-gradient"></div>
+		<div class="media-preview-overlay" id="mediaPreviewOverlay" hidden>
+			<div class="media-preview-content" id="mediaPreviewContent"></div>
+		</div>
 
 		<script>
-			// Card toggle logic
-			function toggleCard(selectedCard) {
-				const allCards = document.querySelectorAll('.zhoubao-card');
-				const isAlreadyExpanded = selectedCard.classList.contains('expanded');
-				
-				allCards.forEach(card => card.classList.remove('expanded'));
-				if (!isAlreadyExpanded) selectedCard.classList.add('expanded');
+			const reports = [
+				{
+					id: 'week2',
+					title: '第二周',
+					date: '2026.05.18 - 2026.05.22',
+					embedSrc: 'week2/zhoubao2.html?embed=1'
+				},
+				{
+					id: 'week1',
+					title: '第一周',
+					date: '2026.05.11 - 2026.05.15',
+					embedSrc: 'week1/zhoubao1.html?embed=1'
+				}
+			];
+
+			const latestReportFrame = document.getElementById('latestReport');
+			const archiveList = document.getElementById('archiveList');
+			const params = new URLSearchParams(window.location.search);
+			const currentReportId = params.get('report') || 'week2';
+			const currentReport = reports.find((report) => report.id === currentReportId) || reports[0];
+
+			latestReportFrame.src = currentReport.embedSrc;
+
+			archiveList.innerHTML = reports
+				.filter((report) => report.id !== currentReport.id)
+				.map((report) => `
+					<a class="zhoubao-card no-cover" href="index.html?report=${report.id}">
+						<div class="card-content">
+							<div class="card-header">
+								<div class="card-title">${report.title}</div>
+							</div>
+							<div class="card-date">${report.date}</div>
+						</div>
+					</a>
+				`)
+				.join('');
+
+			function setIframeHeight(iframe, height) {
+				if (!iframe || !Number.isFinite(height)) return;
+				iframe.style.height = `${Math.max(120, height)}px`;
 			}
+
+			const mediaPreviewOverlay = document.getElementById('mediaPreviewOverlay');
+			const mediaPreviewContent = document.getElementById('mediaPreviewContent');
+
+			function closeMediaPreview() {
+				mediaPreviewOverlay.hidden = true;
+				mediaPreviewContent.innerHTML = '';
+			}
+
+			function openMediaPreview(mediaType, src) {
+				const mediaNode = document.createElement(mediaType === 'video' ? 'video' : 'img');
+				if (mediaType === 'video') {
+					mediaNode.src = src;
+					mediaNode.controls = true;
+					mediaNode.autoplay = true;
+				} else {
+					mediaNode.src = src;
+					mediaNode.alt = '预览';
+				}
+				mediaPreviewContent.innerHTML = '';
+				mediaPreviewContent.appendChild(mediaNode);
+				mediaPreviewOverlay.hidden = false;
+			}
+
+			window.addEventListener('message', (event) => {
+				const data = event.data;
+				if (!data) return;
+				if (data.type === 'openMediaPreview' && data.src) {
+					openMediaPreview(data.mediaType, data.src);
+					return;
+				}
+				if (data.type !== 'reportHeight' || !data.name) return;
+				const iframe = document.querySelector(`iframe[name="${data.name}"]`);
+				setIframeHeight(iframe, data.height);
+			});
+
+			mediaPreviewOverlay.addEventListener('click', (e) => {
+				if (e.target === mediaPreviewOverlay) closeMediaPreview();
+			});
+
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'Escape' && !mediaPreviewOverlay.hidden) closeMediaPreview();
+			});
+
+			document.querySelectorAll('iframe.report-iframe').forEach((iframe) => {
+				iframe.addEventListener('load', () => {
+					try {
+						setIframeHeight(iframe, iframe.contentDocument.documentElement.scrollHeight);
+					} catch {}
+				});
+			});
 
 			// Menu logic
 			const menuBtn = document.getElementById('menuBtn');
