@@ -369,6 +369,7 @@
 				border: 0;
 				min-height: 400px;
 				background: transparent;
+				overflow: hidden;
 			}
 
 			.global-lightbox {
@@ -394,14 +395,6 @@
 				object-fit: contain;
 			}
 
-			.global-lightbox video {
-				max-width: min(96vw, 1600px);
-				max-height: 94vh;
-				width: auto;
-				height: auto;
-				object-fit: contain;
-				background: #000;
-			}
 		</style>
 	</head>
 	<body>
@@ -453,7 +446,7 @@
 			</div>
 
 			<div class="latest-report">
-				<iframe class="report-iframe" id="latestReport" name="latestReport" src="week2/zhoubao2.html?embed=1" loading="lazy" allow="fullscreen; autoplay" allowfullscreen></iframe>
+				<iframe class="report-iframe" id="latestReport" name="latestReport" src="week2/zhoubao2.html?embed=1" loading="lazy" allow="fullscreen; autoplay" allowfullscreen scrolling="no"></iframe>
 			</div>
 
 			<h2>往期周报</h2>
@@ -464,7 +457,6 @@
 		<div class="bottom-gradient"></div>
 		<div class="global-lightbox" id="globalLightbox" aria-hidden="true">
 			<img id="globalLightboxImage" alt="">
-			<video id="globalLightboxVideo" controls playsinline autoplay loop muted></video>
 		</div>
 
 		<script>
@@ -534,25 +526,9 @@
 
 			const globalLightbox = document.getElementById('globalLightbox');
 			const globalLightboxImage = document.getElementById('globalLightboxImage');
-			const globalLightboxVideo = document.getElementById('globalLightboxVideo');
 			function openGlobalLightbox(src, alt = '') {
-				globalLightboxVideo.pause();
-				globalLightboxVideo.removeAttribute('src');
-				globalLightboxVideo.style.display = 'none';
-				globalLightboxImage.style.display = 'block';
 				globalLightboxImage.src = src;
 				globalLightboxImage.alt = alt;
-				globalLightbox.classList.add('open');
-				globalLightbox.setAttribute('aria-hidden', 'false');
-				body.style.overflow = 'hidden';
-			}
-			function openGlobalVideo(src) {
-				globalLightboxImage.removeAttribute('src');
-				globalLightboxImage.style.display = 'none';
-				globalLightboxVideo.style.display = 'block';
-				globalLightboxVideo.src = src;
-				globalLightboxVideo.load();
-				globalLightboxVideo.play().catch(() => {});
 				globalLightbox.classList.add('open');
 				globalLightbox.setAttribute('aria-hidden', 'false');
 				body.style.overflow = 'hidden';
@@ -561,8 +537,6 @@
 				globalLightbox.classList.remove('open');
 				globalLightbox.setAttribute('aria-hidden', 'true');
 				globalLightboxImage.removeAttribute('src');
-				globalLightboxVideo.pause();
-				globalLightboxVideo.removeAttribute('src');
 				body.style.overflow = '';
 			}
 
@@ -575,9 +549,6 @@
 				}
 				if (data.type === 'reportImageOpen' && data.src) {
 					openGlobalLightbox(data.src, data.alt || 'preview');
-				}
-				if (data.type === 'reportVideoOpen' && data.src) {
-					openGlobalVideo(data.src);
 				}
 			});
 

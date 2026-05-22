@@ -323,6 +323,7 @@ body {
 body.embed-mode {
 	padding: 0;
 	background: transparent;
+	overflow: hidden;
 }
 
 body.embed-mode .nav-btn,
@@ -1364,13 +1365,6 @@ blockquote.quote-large {
 				video.play().catch(() => {});
 			});
 			video.addEventListener('click', async () => {
-				if (isEmbed) {
-					const source = video.currentSrc || video.getAttribute('src') || video.querySelector('source')?.src;
-					if (source) {
-						window.parent.postMessage({ type: 'reportVideoOpen', src: source }, '*');
-						return;
-					}
-				}
 				try {
 					if (video.requestFullscreen) await video.requestFullscreen();
 					else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
