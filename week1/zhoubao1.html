@@ -1364,6 +1364,7 @@ blockquote.quote-large {
 			video.loop = true;
 			video.autoplay = true;
 			video.playsInline = true;
+			video.setAttribute('webkit-playsinline', '');
 			video.setAttribute('muted', '');
 			video.setAttribute('loop', '');
 			video.setAttribute('autoplay', '');
@@ -1372,6 +1373,13 @@ blockquote.quote-large {
 				video.play().catch(() => {});
 			});
 			video.addEventListener('click', async () => {
+				if (isEmbed) {
+					const source = video.currentSrc || video.getAttribute('src') || video.querySelector('source')?.src;
+					if (source) {
+						window.parent.postMessage({ type: 'reportVideoOpen', src: source }, '*');
+						return;
+					}
+				}
 				try {
 					if (video.requestFullscreen) await video.requestFullscreen();
 					else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
