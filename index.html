@@ -47,7 +47,7 @@
 				margin: 0 auto;
 			}
 			.header-section {
-				margin-bottom: 24px;
+				margin-bottom: 10px;
 				position: relative;
 			}
 			h1 {
@@ -69,7 +69,7 @@
 
 			h2 {
 				font-size: 1.15rem;
-				margin: 28px 0 12px;
+				margin: 10px 0 4px;
 				font-weight: 700;
 			}
 
@@ -360,7 +360,7 @@
 
 			.latest-report {
 				margin-top: 4px;
-				margin-bottom: 40px;
+				margin-bottom: 18px;
 			}
 
 			.report-iframe {
@@ -396,14 +396,13 @@
 			}
 
 			.global-lightbox video {
-				display: none;
-				width: min(96vw, 1600px);
+				max-width: min(96vw, 1600px);
 				max-height: 94vh;
+				width: auto;
 				height: auto;
 				object-fit: contain;
 				background: #000;
 			}
-
 		</style>
 	</head>
 	<body>
@@ -455,7 +454,7 @@
 			</div>
 
 			<div class="latest-report">
-				<iframe class="report-iframe" id="latestReport" name="latestReport" src="week2/zhoubao2.html?embed=1" loading="lazy" allow="fullscreen; autoplay" allowfullscreen scrolling="no"></iframe>
+				<iframe class="report-iframe" id="latestReport" name="latestReport" src="week3/zhoubao3.html?embed=1" loading="lazy" allow="fullscreen; autoplay" allowfullscreen scrolling="no"></iframe>
 			</div>
 
 			<h2>往期周报</h2>
@@ -471,6 +470,12 @@
 
 		<script>
 			const reports = [
+				{
+					id: 'week3',
+					title: '第三周',
+					date: '2026.05.25 - 2026.05.29',
+					embedSrc: 'week3/zhoubao3.html?embed=1'
+				},
 				{
 					id: 'week2',
 					title: '第二周',
@@ -488,7 +493,7 @@
 			const latestReportFrame = document.getElementById('latestReport');
 			const archiveList = document.getElementById('archiveList');
 			const params = new URLSearchParams(window.location.search);
-			const currentReportId = params.get('report') || 'week2';
+			const currentReportId = params.get('report') || 'week3';
 			const currentReport = reports.find((report) => report.id === currentReportId) || reports[0];
 
 			latestReportFrame.src = currentReport.embedSrc;
@@ -584,8 +589,6 @@
 			});
 
 			globalLightbox.addEventListener('click', closeGlobalLightbox);
-			globalLightboxImage.addEventListener('click', (e) => e.stopPropagation());
-			globalLightboxVideo.addEventListener('click', (e) => e.stopPropagation());
 			document.addEventListener('keydown', (e) => {
 				if (e.key === 'Escape' && globalLightbox.classList.contains('open')) closeGlobalLightbox();
 			});

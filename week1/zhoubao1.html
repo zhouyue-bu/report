@@ -541,15 +541,6 @@ video {
 	cursor: zoom-out;
 }
 
-.image-lightbox video {
-	display: none;
-	width: min(96vw, 1400px);
-	max-height: 92vh;
-	height: auto;
-	object-fit: contain;
-	background: #000;
-}
-
 .media-stack {
 	display: grid;
 	gap: 12px;
@@ -1261,7 +1252,7 @@ blockquote.quote-large {
 </p></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-8094-b936-df461618dc5b" class="">Part1: AI agent创新形式探索</p></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-80f6-a005-d418f0855bc3" class="">
 </p></div><div style="display:contents" dir="auto"><div class="media-stack"><figure><img src="W1/Yue.png" alt="Yue"></figure></div></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-80d9-add5-e60b0707ea86" class="">Part2: 酷小狗形态IP</p></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-8008-8d14-f73055e29a28" class="">
 </p></div><div style="display:contents" dir="auto"><div class="media-stack"><figure><video controls playsinline preload="metadata"><source src="W1/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4" type="video/mp4"></video></figure></div></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-80a4-be37-c85422294cd1" class="">Part3：其他方案</p></div><div style="display:contents" dir="auto"><p id="361b2cae-7a84-80d6-a153-f520a927205c" class="">
-</p></div><div style="display:contents" dir="auto"><div class="media-stack"><figure><img src="W1/part3.png" alt="part3"></figure></div></div><div class="report-links"><p class="report-links-title"><strong>往期周报</strong></p><div class="report-links-list"><a class="report-link-card" href="../week2/zhoubao2.html"><div class="report-link-title">第二周</div><div class="report-link-date">2026.05.18 - 2026.05.22</div></a><a class="report-link-card" href="../week1/zhoubao1.html"><div class="report-link-title">第一周</div><div class="report-link-date">2026.05.11 - 2026.05.15</div></a></div></div></div></article><div class="image-lightbox" id="imageLightbox" aria-hidden="true"><img id="lightboxImage" alt=""><video id="lightboxVideo" controls playsinline autoplay loop muted></video></div><span class="sans" style="font-size:14px;padding-top:2em"></span>	<script>
+</p></div><div style="display:contents" dir="auto"><div class="media-stack"><figure><img src="W1/part3.png" alt="part3"></figure></div></div><div class="report-links"><p class="report-links-title"><strong>往期周报</strong></p><div class="report-links-list"><a class="report-link-card" href="../week3/zhoubao3.html"><div class="report-link-title">第三周</div><div class="report-link-date">2026.05.25 - 2026.05.29</div></a><a class="report-link-card" href="../week2/zhoubao2.html"><div class="report-link-title">第二周</div><div class="report-link-date">2026.05.18 - 2026.05.22</div></a><a class="report-link-card" href="../week1/zhoubao1.html"><div class="report-link-title">第一周</div><div class="report-link-date">2026.05.11 - 2026.05.15</div></a></div></div></div></article><div class="image-lightbox" id="imageLightbox" aria-hidden="true"><img id="lightboxImage" alt=""></div><span class="sans" style="font-size:14px;padding-top:2em"></span>	<script>
 		// Menu logic
 		const menuBtn = document.getElementById('menuBtn');
 		const settingsMenu = document.getElementById('settingsMenu');
@@ -1374,14 +1365,12 @@ blockquote.quote-large {
 				video.play().catch(() => {});
 			});
 			video.addEventListener('click', async () => {
-				const source = video.currentSrc || video.getAttribute('src') || video.querySelector('source')?.src;
-				if (source && isEmbed) {
-					window.parent.postMessage({ type: 'reportVideoOpen', src: source }, '*');
-					return;
-				}
-				if (source) {
-					openVideoLightbox(source);
-					return;
+				if (isEmbed) {
+					const source = video.currentSrc || video.getAttribute('src') || video.querySelector('source')?.src;
+					if (source) {
+						window.parent.postMessage({ type: 'reportVideoOpen', src: source }, '*');
+						return;
+					}
 				}
 				try {
 					if (video.requestFullscreen) await video.requestFullscreen();
@@ -1420,25 +1409,9 @@ blockquote.quote-large {
 
 		const lightbox = document.getElementById('imageLightbox');
 		const lightboxImage = document.getElementById('lightboxImage');
-		const lightboxVideo = document.getElementById('lightboxVideo');
 		const openLightbox = (src, alt = '') => {
-			lightboxVideo.pause();
-			lightboxVideo.removeAttribute('src');
-			lightboxVideo.style.display = 'none';
-			lightboxImage.style.display = 'block';
 			lightboxImage.src = src;
 			lightboxImage.alt = alt;
-			lightbox.classList.add('open');
-			lightbox.setAttribute('aria-hidden', 'false');
-			body.style.overflow = 'hidden';
-		};
-		const openVideoLightbox = (src) => {
-			lightboxImage.removeAttribute('src');
-			lightboxImage.style.display = 'none';
-			lightboxVideo.style.display = 'block';
-			lightboxVideo.src = src;
-			lightboxVideo.load();
-			lightboxVideo.play().catch(() => {});
 			lightbox.classList.add('open');
 			lightbox.setAttribute('aria-hidden', 'false');
 			body.style.overflow = 'hidden';
@@ -1447,8 +1420,6 @@ blockquote.quote-large {
 			lightbox.classList.remove('open');
 			lightbox.setAttribute('aria-hidden', 'true');
 			lightboxImage.removeAttribute('src');
-			lightboxVideo.pause();
-			lightboxVideo.removeAttribute('src');
 			body.style.overflow = '';
 		};
 		document.querySelectorAll('img:not(.icon):not(.notion-static-icon)').forEach((img) => {
@@ -1463,8 +1434,6 @@ blockquote.quote-large {
 			});
 		});
 		lightbox.addEventListener('click', closeLightbox);
-		lightboxImage.addEventListener('click', (e) => e.stopPropagation());
-		lightboxVideo.addEventListener('click', (e) => e.stopPropagation());
 		document.addEventListener('keydown', (e) => {
 			if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
 		});
